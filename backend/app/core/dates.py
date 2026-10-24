@@ -44,5 +44,16 @@ def month_name_pt(month_number: int) -> str:
         raise ValueError(f"Mes invalido: {month_number}")
     return MONTH_NAMES_PT[month_number - 1]
 
+def month_label(year: int, month: int) -> str:
+    return f"{year:04d}-{month:02d}"
+
 def year_month(day: date) -> str:
-    return f"{day.year:04d}-{day.month:02d}"
+    return month_label(day.year, day.month)
+
+def months_between(start: tuple[int, int], end: tuple[int, int]) -> list[tuple[int, int]]:
+    months: list[tuple[int, int]] = []
+    current = next_month(*start)
+    while current < end:
+        months.append(current)
+        current = next_month(*current)
+    return months
