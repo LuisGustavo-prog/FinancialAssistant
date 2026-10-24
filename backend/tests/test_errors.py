@@ -1,10 +1,14 @@
 import pytest
 from app.errors import (
     AppError,
+    DefaultCategoryLockedError,
     FutureDateError,
     LeftoverIncomeLockedError,
     LeftoverNotPendingError,
     MonthClosedError,
+    NameAlreadyExistsError,
+    NoOpenMonthError,
+    NotFoundError,
     PaymentExceedsReportedValueError,
     ValueDecreasedError,
 )
@@ -26,6 +30,10 @@ from app.errors import (
         ),
         (LeftoverIncomeLockedError(), "leftover_income_locked", {}),
         (LeftoverNotPendingError("carried"), "leftover_not_pending", {"decision": "carried"}),
+        (NotFoundError("category", 7), "not_found", {"resource": "category", "id": 7}),
+        (NoOpenMonthError(), "no_open_month", {}),
+        (NameAlreadyExistsError("Mercado"), "name_already_exists", {"name": "Mercado"}),
+        (DefaultCategoryLockedError(), "default_category_locked", {}),
     ],
 )
 def test_each_error_has_its_code_and_params(error, code, params):

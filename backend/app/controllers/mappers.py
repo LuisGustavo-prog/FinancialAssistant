@@ -1,6 +1,6 @@
 import json
 from datetime import date
-from app.core.models import CardEntry, CardEntryType, Notice, NoticeCode, Template
+from app.core.models import CardEntry, CardEntryType, MonthCopy, Notice, NoticeCode, Template
 
 def to_date(text: str) -> date:
     return date.fromisoformat(text)
@@ -17,6 +17,14 @@ def to_template(row: dict) -> Template:
         name=row["name"],
         amount=row["amount"],
         is_active=bool(row["is_active"]),
+    )
+
+def to_month_copy(row: dict) -> MonthCopy:
+    return MonthCopy(
+        id=row["id"],
+        template_id=row["template_id"],
+        name=row["name"],
+        amount=row["amount"],
     )
 
 def to_card_entry(row: dict) -> CardEntry:

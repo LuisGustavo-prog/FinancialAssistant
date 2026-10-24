@@ -11,7 +11,14 @@ from app.controllers.mappers import (
     to_template,
 )
 from app.controllers.session import session
-from app.core.month_routine import OpenMonth, RoutinePlan, RoutineState, plan_month_routine
+from app.core.month_routine import (
+    NewMonth,
+    OpenMonth,
+    RoutinePlan,
+    RoutineState,
+    build_new_month,
+    plan_month_routine,
+)
 from app.core.notices import store_notices
 from app.db.repositories import credit_card_repository as cards
 from app.db.repositories import month_repository as months
@@ -77,16 +84,7 @@ def _apply(conn: sqlite3.Connection, plan: RoutinePlan) -> tuple[int | None, int
         closed_id = closing.month_id
 
     if plan.new_month is not None:
-        new_month = plan.new_month
-        created_id = months.create_month(
-            conn, new_month.year, new_month.month_number, new_month.salary
-        )
-        for copy in new_month.fixed_expenses:
-            months.insert_fixed_expense(conn, created_id, copy.template_id, copy.name, copy.amount)
-        for copy in new_month.savings_quotas:
-            months.insert_savings_quota(conn, created_id, copy.template_id, copy.name, copy.amount)
-        for card_id in new_month.card_ids:
-            cards.insert_card_month(conn, card_id, created_id)
+        created_id = create_month(conn, plan.new_month)
 
     if plan.new_notices:
         existing = notices_from_json(settings.get(conn)["pending_notices"])
@@ -95,3 +93,23 @@ def _apply(conn: sqlite3.Connection, plan: RoutinePlan) -> tuple[int | None, int
 
     settings.set_last_checked_date(conn, to_iso(plan.last_checked_date))
     return closed_id, created_id
+
+def create_month(conn: sqlite3.Connection, new_month: NewMonth) -> int:
+    month_id = months.create_month(conn, new_month.year, new_month.month_number, new_month.salary)
+    for copy in new_month.fixed_expenses:
+        months.insert_fixed_expense(conn, month_id, copy.template_id, copy.name, copy.amount)
+    for copy in new_month.savings_quotas:
+        months.insert_savings_quota(conn, month_id, copy.template_id, copy.name, copy.amount)
+    for card_id in new_month.card_ids:
+        cards.insert_card_month(conn, card_id, month_id)
+    return month_id
+
+def new_month_for(conn: sqlite3.Connection, year: int, month_number: int, salary: float) -> NewMonth:
+    return build_new_month(
+        year,
+        month_number,
+        salary,
+        [to_template(r) for r in templates.list_fixed_expense_templates(conn)],
+        [to_template(r) for r in templates.list_savings_quota_templates(conn)],
+        cards.list_active_card_ids(conn),
+    )
