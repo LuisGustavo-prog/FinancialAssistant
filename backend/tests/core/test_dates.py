@@ -6,7 +6,9 @@ from app.core.dates import (
     first_day_of_month,
     is_same_month,
     last_day_of_month,
+    month_name_pt,
     next_month,
+    year_month,
 )
 
 def test_first_day_of_month():
@@ -69,3 +71,19 @@ def test_next_month_wraps_december_to_january():
 def test_next_month_refuses_invalid_month(bad_month):
     with pytest.raises(ValueError):
         next_month(2026, bad_month)
+
+@pytest.mark.parametrize(
+    ("number", "name"),
+    [(1, "janeiro"), (3, "março"), (10, "outubro"), (12, "dezembro")],
+)
+def test_month_name_pt(number, name):
+    assert month_name_pt(number) == name
+
+@pytest.mark.parametrize("bad_month", [0, 13])
+def test_month_name_pt_refuses_invalid_month(bad_month):
+    with pytest.raises(ValueError):
+        month_name_pt(bad_month)
+
+def test_year_month_label_is_zero_padded():
+    assert year_month(date(2026, 10, 23)) == "2026-10"
+    assert year_month(date(2026, 3, 1)) == "2026-03"

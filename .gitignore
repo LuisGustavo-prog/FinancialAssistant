@@ -72,3 +72,6 @@ tmp/
 Thumbs.db
 desktop.ini
 *:Zone.Identifier
+
+docs/
+data/

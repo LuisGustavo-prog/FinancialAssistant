@@ -3,6 +3,7 @@ from app.errors import (
     AppError,
     FutureDateError,
     LeftoverIncomeLockedError,
+    LeftoverNotPendingError,
     MonthClosedError,
     PaymentExceedsReportedValueError,
     ValueDecreasedError,
@@ -24,6 +25,7 @@ from app.errors import (
             {"amount": 120.0, "reported_value": 100.0},
         ),
         (LeftoverIncomeLockedError(), "leftover_income_locked", {}),
+        (LeftoverNotPendingError("carried"), "leftover_not_pending", {"decision": "carried"}),
     ],
 )
 def test_each_error_has_its_code_and_params(error, code, params):

@@ -28,3 +28,9 @@ class PaymentExceedsReportedValueError(AppError):
 
 class LeftoverIncomeLockedError(AppError):
     code = "leftover_income_locked"
+
+class LeftoverNotPendingError(AppError):
+    code = "leftover_not_pending"
+
+    def __init__(self, decision: str | None) -> None:
+        super().__init__(decision=decision)
