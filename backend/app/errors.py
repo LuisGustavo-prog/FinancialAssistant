@@ -92,3 +92,12 @@ class DefaultCategoryLockedError(AppError):
     """A categoria padrao "Outros" nao pode ser desativada."""
 
     code = "default_category_locked"
+
+
+class CategoryInactiveError(AppError):
+    """Categoria desativada nao pode ser escolhida para um gasto novo ou alterado."""
+
+    code = "category_inactive"
+
+    def __init__(self, category_id: int) -> None:
+        super().__init__(category_id=category_id)

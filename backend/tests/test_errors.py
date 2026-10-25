@@ -1,6 +1,7 @@
 import pytest
 from app.errors import (
     AppError,
+    CategoryInactiveError,
     DefaultCategoryLockedError,
     FutureDateError,
     LeftoverIncomeLockedError,
@@ -34,6 +35,7 @@ from app.errors import (
         (NoOpenMonthError(), "no_open_month", {}),
         (NameAlreadyExistsError("Mercado"), "name_already_exists", {"name": "Mercado"}),
         (DefaultCategoryLockedError(), "default_category_locked", {}),
+        (CategoryInactiveError(4), "category_inactive", {"category_id": 4}),
     ],
 )
 def test_each_error_has_its_code_and_params(error, code, params):
