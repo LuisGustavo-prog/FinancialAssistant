@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import date
 from app.controllers.current_day import resolve_today
+from app.controllers.items import expense_item
 from app.controllers.mappers import to_date, to_iso
 from app.controllers.session import session
 from app.controllers.unset import UNSET, _Unset
@@ -10,16 +11,6 @@ from app.db.repositories import category_repository as categories
 from app.db.repositories import expense_repository as expenses
 from app.db.repositories import month_repository as months
 from app.errors import CategoryInactiveError, NoOpenMonthError, NotFoundError
-
-def _item(row: dict) -> dict:
-    return {
-        "id": row["id"],
-        "amount": row["amount"],
-        "occurred_on": row["occurred_on"],
-        "description": row["description"],
-        "category": {"id": row["category_id"], "name": row["category_name"]},
-        "payment_method": row["payment_method"],
-    }
 
 def _clean_description(description: str | None) -> str | None:
     if description is None:
@@ -54,7 +45,7 @@ def list_expenses() -> list[dict]:
         month = months.get_open_month(conn)
         if month is None:
             return []
-        return [_item(row) for row in expenses.list_expenses(conn, month["id"])]
+        return [expense_item(row) for row in expenses.list_expenses(conn, month["id"])]
 
 def create_expense(
     amount: float,
@@ -73,7 +64,7 @@ def create_expense(
         expense_id = expenses.insert_expense(
             conn, month["id"], value, to_iso(entry_date), _clean_description(description), chosen
         )
-        return _item(expenses.get_expense(conn, expense_id))
+        return expense_item(expenses.get_expense(conn, expense_id))
 
 def update_expense(
     expense_id: int,
@@ -102,8 +93,7 @@ def update_expense(
             if category_id is None
             else _chosen_category(conn, category_id, keep_id=row["category_id"]),
         )
-        return _item(expenses.get_expense(conn, expense_id))
-
+        return expense_item(expenses.get_expense(conn, expense_id))
 
 def delete_expense(expense_id: int, today: date | None = None) -> None:
     with session(immediate=True) as conn:

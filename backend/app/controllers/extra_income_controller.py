@@ -1,25 +1,16 @@
 import sqlite3
 from datetime import date
 from app.controllers.current_day import resolve_today
+from app.controllers.items import extra_income_item
 from app.controllers.mappers import to_date, to_iso
 from app.controllers.session import session
 from app.controllers.unset import UNSET, _Unset
-from app.core.guards import check_entry_date, check_entry_edit, ensure_income_editable, is_income_editable
+from app.core.guards import check_entry_date, check_entry_edit, ensure_income_editable
 from app.core.models import IncomeSource
 from app.core.money import round_money
 from app.db.repositories import extra_income_repository as incomes
 from app.db.repositories import month_repository as months
 from app.errors import NoOpenMonthError, NotFoundError
-
-def _item(row: dict) -> dict:
-    return {
-        "id": row["id"],
-        "amount": row["amount"],
-        "occurred_on": row["occurred_on"],
-        "description": row["description"],
-        "source": row["source"],
-        "is_editable": is_income_editable(row["source"]),
-    }
 
 def _clean_description(description: str | None) -> str | None:
     if description is None:
@@ -44,7 +35,7 @@ def list_extra_incomes() -> list[dict]:
         month = months.get_open_month(conn)
         if month is None:
             return []
-        return [_item(row) for row in incomes.list_extra_incomes(conn, month["id"])]
+        return [extra_income_item(row) for row in incomes.list_extra_incomes(conn, month["id"])]
 
 def create_extra_income(
     amount: float,
@@ -68,7 +59,7 @@ def create_extra_income(
             _clean_description(description),
             IncomeSource.MANUAL.value,
         )
-        return _item(incomes.get_extra_income(conn, income_id))
+        return extra_income_item(incomes.get_extra_income(conn, income_id))
 
 def update_extra_income(
     income_id: int,
@@ -92,7 +83,7 @@ def update_extra_income(
             to_iso(new_date),
             row["description"] if isinstance(description, _Unset) else _clean_description(description),
         )
-        return _item(incomes.get_extra_income(conn, income_id))
+        return extra_income_item(incomes.get_extra_income(conn, income_id))
 
 def delete_extra_income(income_id: int, today: date | None = None) -> None:
     with session(immediate=True) as conn:

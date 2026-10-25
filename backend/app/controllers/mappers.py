@@ -1,6 +1,15 @@
 import json
 from datetime import date
-from app.core.models import CardEntry, CardEntryType, MonthCopy, Notice, NoticeCode, Template
+from app.core.models import (
+    CardEntry,
+    CardEntryType,
+    ClosedMonth,
+    LeftoverDecision,
+    MonthCopy,
+    Notice,
+    NoticeCode,
+    Template,
+)
 
 def to_date(text: str) -> date:
     return date.fromisoformat(text)
@@ -25,6 +34,15 @@ def to_month_copy(row: dict) -> MonthCopy:
         template_id=row["template_id"],
         name=row["name"],
         amount=row["amount"],
+    )
+
+def to_closed_month(row: dict) -> ClosedMonth:
+    decision = row["leftover_decision"]
+    return ClosedMonth(
+        year=row["year"],
+        month_number=row["month_number"],
+        final_balance=row["final_balance"],
+        leftover_decision=None if decision is None else LeftoverDecision(decision),
     )
 
 def to_card_entry(row: dict) -> CardEntry:
