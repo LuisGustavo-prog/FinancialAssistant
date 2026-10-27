@@ -10,6 +10,7 @@ from app.db.repositories import month_repository as months
 from app.db.repositories import template_repository as templates
 from app.errors import DefaultCategoryLockedError, NameAlreadyExistsError, NotFoundError
 
+
 @dataclass(frozen=True, slots=True)
 class _Kind:
     resource: str
@@ -21,6 +22,7 @@ class _Kind:
     insert_copy: Callable
     update_copy: Callable
     delete_copy: Callable
+
 
 _FIXED_EXPENSE = _Kind(
     resource="fixed_expense",
@@ -46,6 +48,7 @@ _SAVINGS_QUOTA = _Kind(
     delete_copy=months.delete_savings_quota,
 )
 
+
 def _template_item(row: dict) -> dict:
     return {
         "id": row["id"],
@@ -53,6 +56,7 @@ def _template_item(row: dict) -> dict:
         "amount": row["amount"],
         "is_active": bool(row["is_active"]),
     }
+
 
 def _sync_open_month(conn: sqlite3.Connection, kind: _Kind, template_row: dict) -> None:
     month = months.get_open_month(conn)
@@ -67,9 +71,11 @@ def _sync_open_month(conn: sqlite3.Connection, kind: _Kind, template_row: dict) 
     elif plan.action == SyncAction.DELETE:
         kind.delete_copy(conn, plan.copy_id)
 
+
 def _list_templates(kind: _Kind) -> list[dict]:
     with session() as conn:
         return [_template_item(row) for row in kind.list_templates(conn)]
+
 
 def _create_template(kind: _Kind, name: str, amount: float) -> dict:
     with session(immediate=True) as conn:
@@ -77,6 +83,7 @@ def _create_template(kind: _Kind, name: str, amount: float) -> dict:
         row = kind.get_template(conn, template_id)
         _sync_open_month(conn, kind, row)
         return _template_item(row)
+
 
 def _update_template(
     kind: _Kind,
@@ -100,11 +107,14 @@ def _update_template(
         _sync_open_month(conn, kind, updated)
         return _template_item(updated)
 
+
 def list_fixed_expenses() -> list[dict]:
     return _list_templates(_FIXED_EXPENSE)
 
+
 def create_fixed_expense(name: str, amount: float) -> dict:
     return _create_template(_FIXED_EXPENSE, name, amount)
+
 
 def update_fixed_expense(
     template_id: int,
@@ -114,11 +124,14 @@ def update_fixed_expense(
 ) -> dict:
     return _update_template(_FIXED_EXPENSE, template_id, name, amount, is_active)
 
+
 def list_savings_quotas() -> list[dict]:
     return _list_templates(_SAVINGS_QUOTA)
 
+
 def create_savings_quota(name: str, amount: float) -> dict:
     return _create_template(_SAVINGS_QUOTA, name, amount)
+
 
 def update_savings_quota(
     template_id: int,
@@ -128,6 +141,7 @@ def update_savings_quota(
 ) -> dict:
     return _update_template(_SAVINGS_QUOTA, template_id, name, amount, is_active)
 
+
 def _category_item(row: dict) -> dict:
     return {
         "id": row["id"],
@@ -136,14 +150,17 @@ def _category_item(row: dict) -> dict:
         "is_active": bool(row["is_active"]),
     }
 
+
 def _ensure_name_is_free(conn: sqlite3.Connection, name: str, ignore_id: int | None = None) -> None:
     for row in categories.list_categories(conn):
         if row["id"] != ignore_id and row["name"].casefold() == name.casefold():
             raise NameAlreadyExistsError(name)
 
+
 def list_categories() -> list[dict]:
     with session() as conn:
         return [_category_item(row) for row in categories.list_categories(conn)]
+
 
 def create_category(name: str) -> dict:
     clean_name = name.strip()
@@ -152,9 +169,8 @@ def create_category(name: str) -> dict:
         category_id = categories.insert_category(conn, clean_name)
         return _category_item(categories.get_category(conn, category_id))
 
-def update_category(
-    category_id: int, name: str | None = None, is_active: bool | None = None
-) -> dict:
+
+def update_category(category_id: int, name: str | None = None, is_active: bool | None = None) -> dict:
     with session(immediate=True) as conn:
         row = categories.get_category(conn, category_id)
         if row is None:

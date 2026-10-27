@@ -19,6 +19,7 @@ from app.db.repositories import credit_card_repository as cards
 from app.db.repositories import month_repository as months
 from app.errors import NoOpenMonthError, NotFoundError
 
+
 def _entry_item(row: dict) -> dict:
     return {
         "id": row["id"],
@@ -26,6 +27,7 @@ def _entry_item(row: dict) -> dict:
         "amount": row["amount"],
         "occurred_on": row["occurred_on"],
     }
+
 
 def _item(card: dict, card_month: dict | None, entry_rows: list[dict], today: date) -> dict:
     base = {"id": card["id"], "name": card["name"], "is_active": bool(card["is_active"])}
@@ -56,12 +58,14 @@ def _item(card: dict, card_month: dict | None, entry_rows: list[dict], today: da
         "entries": [_entry_item(row) for row in entry_rows],
     }
 
+
 def _view(conn: sqlite3.Connection, card_id: int, today: date) -> dict:
     card = cards.get_card(conn, card_id)
     month = months.get_open_month(conn)
     card_month = cards.get_card_month(conn, card_id, month["id"]) if month else None
     entry_rows = cards.list_entries(conn, card_month["id"]) if card_month else []
     return _item(card, card_month, entry_rows, today)
+
 
 def _month_data(conn: sqlite3.Connection, card_id: int) -> tuple[dict, dict]:
     if cards.get_card(conn, card_id) is None:
@@ -73,6 +77,7 @@ def _month_data(conn: sqlite3.Connection, card_id: int) -> tuple[dict, dict]:
     if card_month is None:
         raise NotFoundError("credit_card_month", card_id)
     return month, card_month
+
 
 def list_cards(today: date | None = None) -> list[dict]:
     with session() as conn:
@@ -91,6 +96,7 @@ def list_cards(today: date | None = None) -> list[dict]:
             items.append(_item(card, card_month, rows, day))
         return items
 
+
 def create_card(name: str, today: date | None = None) -> dict:
     with session(immediate=True) as conn:
         card_id = cards.insert_card(conn, name.strip())
@@ -98,6 +104,7 @@ def create_card(name: str, today: date | None = None) -> dict:
         if month is not None:
             cards.insert_card_month(conn, card_id, month["id"])
         return _view(conn, card_id, resolve_today(conn, today))
+
 
 def update_card(
     card_id: int,
@@ -117,6 +124,7 @@ def update_card(
             cards.insert_card_month(conn, card_id, month["id"])
         return _view(conn, card_id, resolve_today(conn, today))
 
+
 def update_reported_value(
     card_id: int,
     reported_value: float,
@@ -135,6 +143,7 @@ def update_reported_value(
         cards.update_reported_value(conn, card_month["id"], new_value, to_iso(day))
         return _view(conn, card_id, day)
 
+
 def register_payment(card_id: int, amount: float, today: date | None = None) -> dict:
     with session(immediate=True) as conn:
         _, card_month = _month_data(conn, card_id)
@@ -144,6 +153,7 @@ def register_payment(card_id: int, amount: float, today: date | None = None) -> 
         cards.insert_entry(conn, card_month["id"], plan.entry.type.value, plan.entry.amount, to_iso(day))
         cards.update_reported_value(conn, card_month["id"], plan.new_reported_value, to_iso(day))
         return _view(conn, card_id, day)
+
 
 def update_entry(
     entry_id: int,
@@ -172,7 +182,10 @@ def update_entry(
             new_amount,
             to_iso(new_date),
         )
-        return _entry_item(next(e for e in cards.list_entries(conn, row["credit_card_month_id"]) if e["id"] == entry_id))
+        return _entry_item(
+            next(e for e in cards.list_entries(conn, row["credit_card_month_id"]) if e["id"] == entry_id)
+        )
+
 
 def delete_entry(entry_id: int, today: date | None = None) -> None:
     with session(immediate=True) as conn:

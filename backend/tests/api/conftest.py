@@ -22,9 +22,7 @@ def freeze(monkeypatch):
     """Troca o relogio do app. `freeze(2026, 10, 23)` vale 12h UTC (9h em Brasilia) desse dia."""
 
     def _freeze(year, month, day, hour=12):
-        monkeypatch.setattr(
-            clock, "_utc_now", lambda: datetime(year, month, day, hour, 0, tzinfo=timezone.utc)
-        )
+        monkeypatch.setattr(clock, "_utc_now", lambda: datetime(year, month, day, hour, 0, tzinfo=timezone.utc))
 
     _freeze(2026, 10, 23)
     return _freeze

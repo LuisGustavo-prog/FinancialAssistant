@@ -7,8 +7,10 @@ from app.db.connection import connect
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 DEFAULT_DB_PATH = "data/financial_assistant.db"
 
+
 def apply_schema(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+
 
 def create_database(path: str | Path) -> None:
     db_path = Path(path)
@@ -23,6 +25,7 @@ def create_database(path: str | Path) -> None:
         db_path.unlink(missing_ok=True)
         raise
     conn.close()
+
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Cria o banco do Financial_Assistant.")

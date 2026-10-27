@@ -8,6 +8,7 @@ from app.db.repositories import month_repository as months
 from app.db.repositories import settings_repository as settings
 from app.db.repositories import template_repository as templates
 
+
 @pytest.fixture
 def db_path(tmp_path, monkeypatch):
     path = tmp_path / "app.db"
@@ -15,6 +16,7 @@ def db_path(tmp_path, monkeypatch):
     monkeypatch.delenv("TIMEZONE", raising=False)
     create_database(path)
     return path
+
 
 @pytest.fixture
 def seed_october(db_path):
@@ -32,7 +34,7 @@ def seed_october(db_path):
             month_id = months.create_month(conn, 2026, 10, salary)
             months.insert_fixed_expense(conn, month_id, fixed_active, "Aluguel", 1200.0)
             months.insert_savings_quota(conn, month_id, quota, "Reserva", 300.0)
-            category_id = 1  
+            category_id = 1
             if debit:
                 expenses.insert_expense(conn, month_id, debit, "2026-10-05", None, category_id)
             card_month_id = cards.insert_card_month(conn, card_id, month_id)
@@ -40,6 +42,7 @@ def seed_october(db_path):
         return {"month_id": month_id, "card_id": card_id, "card_month_id": card_month_id}
 
     return seed
+
 
 def read(sql, params=()):
     with session() as conn:

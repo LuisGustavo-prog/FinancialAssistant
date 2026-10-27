@@ -19,7 +19,11 @@ def test_an_unknown_host_is_refused_against_dns_rebinding(client):
 def test_cors_preflight_for_the_front_origin(client):
     response = client.options(
         "/expenses",
-        headers={"Origin": ORIGIN, "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type"},
+        headers={
+            "Origin": ORIGIN,
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
     )
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == ORIGIN

@@ -204,14 +204,18 @@ class TestCopies:
         assert [r["id"] for r in list_(conn, month_id)] == [keep]
         assert delete(conn, gone) is False
 
-    def test_total_is_rounded_and_float_even_when_empty(self, conn, month_id, list_, insert, update, delete, total, template_table):
+    def test_total_is_rounded_and_float_even_when_empty(
+        self, conn, month_id, list_, insert, update, delete, total, template_table
+    ):
         empty = total(conn, month_id)
         assert empty == 0.0 and isinstance(empty, float)
         insert(conn, month_id, None, "A", 0.1)
         insert(conn, month_id, None, "B", 0.2)
         assert total(conn, month_id) == 0.3
 
-    def test_each_month_only_sees_its_own_copies(self, conn, month_id, list_, insert, update, delete, total, template_table):
+    def test_each_month_only_sees_its_own_copies(
+        self, conn, month_id, list_, insert, update, delete, total, template_table
+    ):
         months.close_month(conn, month_id, 0.0, "green", "2026-11-01", None)
         other_month = months.create_month(conn, 2026, 11, 3000.0)
         insert(conn, month_id, None, "Antigo", 500.0)
@@ -220,15 +224,17 @@ class TestCopies:
         assert total(conn, other_month) == 70.0
         assert total(conn, month_id) == 500.0
 
-    def test_the_same_template_cannot_be_copied_twice_into_a_month(self, conn, month_id, list_, insert, update, delete, total, template_table):
-        template_id = conn.execute(
-            f"INSERT INTO {template_table} (name, amount) VALUES ('Modelo', 100)"
-        ).lastrowid
+    def test_the_same_template_cannot_be_copied_twice_into_a_month(
+        self, conn, month_id, list_, insert, update, delete, total, template_table
+    ):
+        template_id = conn.execute(f"INSERT INTO {template_table} (name, amount) VALUES ('Modelo', 100)").lastrowid
         insert(conn, month_id, template_id, "Modelo", 100.0)
         with pytest.raises(sqlite3.IntegrityError):
             insert(conn, month_id, template_id, "Modelo", 100.0)
 
-    def test_invalid_amount_is_refused_by_the_schema(self, conn, month_id, list_, insert, update, delete, total, template_table):
+    def test_invalid_amount_is_refused_by_the_schema(
+        self, conn, month_id, list_, insert, update, delete, total, template_table
+    ):
         with pytest.raises(sqlite3.IntegrityError):
             insert(conn, month_id, None, "Errado", 10.999)
 

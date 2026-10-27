@@ -6,6 +6,7 @@ DEFAULT_ALLOWED_ORIGINS = "http://127.0.0.1:8080,http://localhost:8080"
 DEFAULT_ALLOWED_HOSTS = "127.0.0.1,localhost"
 DEFAULT_TIMEZONE = "America/Sao_Paulo"
 
+
 @dataclass(frozen=True)
 class Config:
     database_path: str
@@ -13,8 +14,10 @@ class Config:
     allowed_hosts: tuple[str, ...]
     timezone: str
 
+
 def _split_list(raw: str) -> tuple[str, ...]:
     return tuple(item.strip() for item in raw.split(",") if item.strip())
+
 
 def load_config() -> Config:
     return Config(

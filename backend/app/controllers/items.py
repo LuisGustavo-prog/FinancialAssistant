@@ -1,5 +1,6 @@
 from app.core.guards import is_income_editable
 
+
 def expense_item(row: dict) -> dict:
     return {
         "id": row["id"],
@@ -9,6 +10,7 @@ def expense_item(row: dict) -> dict:
         "category": {"id": row["category_id"], "name": row["category_name"]},
         "payment_method": row["payment_method"],
     }
+
 
 def extra_income_item(row: dict) -> dict:
     return {

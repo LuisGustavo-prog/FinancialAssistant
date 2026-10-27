@@ -7,6 +7,7 @@ from app.core.money import round_money
 MONTH_ENDING_LAST_DAYS = 3
 CARD_NOT_UPDATED_FROM_DAY = 10
 
+
 def month_ending_notice(today: date, has_active_cards: bool) -> Notice | None:
     days_left = days_left_in_month(today)
     if days_left >= MONTH_ENDING_LAST_DAYS:
@@ -17,6 +18,7 @@ def month_ending_notice(today: date, has_active_cards: bool) -> Notice | None:
         params={"days_left": days_left, "has_active_cards": has_active_cards},
     )
 
+
 def card_not_updated_notice(today: date, cards: Iterable[CardStatus]) -> Notice | None:
     if today.day < CARD_NOT_UPDATED_FROM_DAY:
         return None
@@ -24,6 +26,7 @@ def card_not_updated_notice(today: date, cards: Iterable[CardStatus]) -> Notice 
     if not names:
         return None
     return Notice(id=None, code=NoticeCode.CREDIT_CARD_NOT_UPDATED, params={"card_names": names})
+
 
 def closing_notices(closed: ClosedMonth, current_year: int, current_month: int) -> list[Notice]:
     notices: list[Notice] = []
@@ -53,6 +56,7 @@ def closing_notices(closed: ClosedMonth, current_year: int, current_month: int) 
         )
     return notices
 
+
 def store_notices(existing: Iterable[Notice], new_notices: Iterable[Notice]) -> list[Notice]:
     stored = list(existing)
     next_id = max((n.id for n in stored if n.id is not None), default=0) + 1
@@ -61,8 +65,10 @@ def store_notices(existing: Iterable[Notice], new_notices: Iterable[Notice]) -> 
         next_id += 1
     return stored
 
+
 def dismiss_stored_notice(existing: Iterable[Notice], notice_id: int) -> list[Notice]:
     return [n for n in existing if n.id != notice_id]
+
 
 def active_notices(
     stored: Iterable[Notice],

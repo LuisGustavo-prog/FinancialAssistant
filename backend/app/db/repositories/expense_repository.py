@@ -8,6 +8,7 @@ _SELECT = """
 """
 _NEWEST_FIRST = "ORDER BY e.occurred_on DESC, e.id DESC"
 
+
 def insert_expense(
     conn: sqlite3.Connection,
     month_id: int,
@@ -23,19 +24,21 @@ def insert_expense(
     )
     return cursor.lastrowid
 
+
 def get_expense(conn: sqlite3.Connection, expense_id: int) -> dict | None:
     row = conn.execute(f"{_SELECT} WHERE e.id = ?", (expense_id,)).fetchone()
     return dict(row) if row else None
+
 
 def list_expenses(conn: sqlite3.Connection, month_id: int) -> list[dict]:
     rows = conn.execute(f"{_SELECT} WHERE e.month_id = ? {_NEWEST_FIRST}", (month_id,)).fetchall()
     return [dict(row) for row in rows]
 
+
 def list_recent_expenses(conn: sqlite3.Connection, month_id: int, limit: int) -> list[dict]:
-    rows = conn.execute(
-        f"{_SELECT} WHERE e.month_id = ? {_NEWEST_FIRST} LIMIT ?", (month_id, limit)
-    ).fetchall()
+    rows = conn.execute(f"{_SELECT} WHERE e.month_id = ? {_NEWEST_FIRST} LIMIT ?", (month_id, limit)).fetchall()
     return [dict(row) for row in rows]
+
 
 def update_expense(
     conn: sqlite3.Connection,
@@ -53,9 +56,11 @@ def update_expense(
     )
     return cursor.rowcount == 1
 
+
 def delete_expense(conn: sqlite3.Connection, expense_id: int) -> bool:
     cursor = conn.execute("DELETE FROM expense WHERE id = ?", (expense_id,))
     return cursor.rowcount == 1
+
 
 def sum_expenses(conn: sqlite3.Connection, month_id: int) -> float:
     row = conn.execute(

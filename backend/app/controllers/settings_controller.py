@@ -10,6 +10,7 @@ from app.db.repositories import month_repository as months
 from app.db.repositories import settings_repository as settings
 from app.errors import NoOpenMonthError
 
+
 def _read(conn: sqlite3.Connection) -> dict:
     row = settings.get(conn)
     month = months.get_open_month(conn)
@@ -22,6 +23,7 @@ def _read(conn: sqlite3.Connection) -> dict:
 def get_settings() -> dict:
     with session() as conn:
         return _read(conn)
+
 
 def save_current_salary(current_salary: float, today: date | None = None) -> dict:
     salary = round_money(current_salary)
@@ -40,6 +42,7 @@ def save_current_salary(current_salary: float, today: date | None = None) -> dic
             create_month(conn, new_month_for(conn, first_day.year, first_day.month, salary))
             settings.set_last_checked_date(conn, to_iso(first_day))
         return _read(conn)
+
 
 def update_current_month_salary(salary: float) -> dict:
     value = round_money(salary)

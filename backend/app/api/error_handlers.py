@@ -22,6 +22,7 @@ STATUS_BY_CODE = {
     "not_found": 404,
 }
 
+
 def error_response(status_code: int, code: str, params: dict | None = None) -> JSONResponse:
     params = params or {}
     return JSONResponse(
@@ -29,8 +30,10 @@ def error_response(status_code: int, code: str, params: dict | None = None) -> J
         content={"code": code, "message": error_message(code, params), "params": params},
     )
 
+
 async def handle_app_error(request: Request, exc: AppError) -> JSONResponse:
     return error_response(STATUS_BY_CODE.get(exc.code, 400), exc.code, exc.params)
+
 
 async def handle_validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
     fields = []
@@ -41,12 +44,14 @@ async def handle_validation_error(request: Request, exc: RequestValidationError)
         fields.append({"field": name, "message": message})
     return error_response(422, "validation_error", {"fields": fields})
 
+
 async def handle_http_error(request: Request, exc: StarletteHTTPException) -> JSONResponse:
     if exc.status_code == 404:
         return error_response(404, "not_found")
     if exc.status_code == 405:
         return error_response(405, "method_not_allowed")
     return error_response(exc.status_code, "internal_error")
+
 
 async def handle_unexpected_error(request: Request, exc: Exception) -> JSONResponse:
     logger.exception("Erro inesperado em %s %s", request.method, request.url.path, exc_info=exc)
@@ -56,6 +61,7 @@ async def handle_unexpected_error(request: Request, exc: Exception) -> JSONRespo
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Vary"] = "Origin"
     return response
+
 
 def register_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, handle_app_error)

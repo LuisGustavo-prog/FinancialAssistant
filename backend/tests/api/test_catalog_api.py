@@ -23,7 +23,16 @@ class TestTemplates:
         assert deactivated.json()["is_active"] is False
         assert ready.get(path).json()[0]["is_active"] is False
 
-    @pytest.mark.parametrize("body", [{"name": "", "amount": 10}, {"name": "x", "amount": 0}, {"name": "x"}, {"amount": 10}, {"name": "a" * 101, "amount": 10}])
+    @pytest.mark.parametrize(
+        "body",
+        [
+            {"name": "", "amount": 10},
+            {"name": "x", "amount": 0},
+            {"name": "x"},
+            {"amount": 10},
+            {"name": "a" * 101, "amount": 10},
+        ],
+    )
     def test_invalid_bodies(self, ready, path, resource_name, body):
         response = ready.post(path, json=body)
         assert response.status_code == 422
@@ -53,9 +62,7 @@ def test_a_new_savings_quota_reaches_the_open_month(ready):
 # Categorias
 # --------------------------------------------------------------------------
 def test_categories_start_with_the_default_one(client):
-    assert client.get("/categories").json() == [
-        {"id": 1, "name": "Outros", "is_default": True, "is_active": True}
-    ]
+    assert client.get("/categories").json() == [{"id": 1, "name": "Outros", "is_default": True, "is_active": True}]
 
 
 def test_create_rename_and_deactivate_a_category(client):

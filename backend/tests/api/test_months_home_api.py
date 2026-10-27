@@ -131,7 +131,11 @@ def test_carrying_the_leftover_creates_a_locked_income_and_clears_the_question(c
     body = response.json()
     assert body["leftover_decision"] == "carried"
     income = body["extra_income"]
-    assert (income["amount"], income["occurred_on"], income["description"]) == (249.25, "2026-11-02", "Sobra de outubro")
+    assert (income["amount"], income["occurred_on"], income["description"]) == (
+        249.25,
+        "2026-11-02",
+        "Sobra de outubro",
+    )
     assert (income["source"], income["is_editable"]) == ("leftover", False)
 
     home = client.get("/home").json()

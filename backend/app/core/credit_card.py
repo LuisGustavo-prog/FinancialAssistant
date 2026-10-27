@@ -8,7 +8,6 @@ from app.errors import PaymentExceedsReportedValueError, ValueDecreasedError
 
 OUTDATED_AFTER_DAYS = 7
 
-
 @dataclass(frozen=True, slots=True)
 class PaymentPlan:
     entry: CardEntry
@@ -18,8 +17,10 @@ class PaymentPlan:
 def payments_total(entries: Iterable[CardEntry]) -> float:
     return sum_money(entry.amount for entry in entries if entry.type == CardEntryType.PAYMENT)
 
+
 def card_total(reported_value: float, entries: Iterable[CardEntry]) -> float:
     return sum_money([reported_value, payments_total(entries)])
+
 
 def plan_reported_value_update(
     current_value: float,
@@ -38,6 +39,7 @@ def plan_reported_value_update(
         raise ValueDecreasedError(difference)
     return CardEntry(type=decrease_type, amount=difference)
 
+
 def plan_payment(reported_value: float, amount: float) -> PaymentPlan:
     reported = round_money(reported_value)
     paid = round_money(amount)
@@ -50,10 +52,12 @@ def plan_payment(reported_value: float, amount: float) -> PaymentPlan:
         new_reported_value=round_money(reported - paid),
     )
 
+
 def days_since_update(updated_at: date | None, today: date) -> int | None:
     if updated_at is None:
         return None
     return max(0, days_since(updated_at, today))
+
 
 def is_outdated(updated_at: date | None, today: date) -> bool:
     days = days_since_update(updated_at, today)

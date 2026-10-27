@@ -3,8 +3,10 @@ from pydantic import BaseModel
 from app.api.schemas.expenses import ExpenseOut
 from app.api.schemas.extra_incomes import ExtraIncomeOut
 
+
 class LeftoverDecisionIn(BaseModel):
     decision: Literal["carried", "declined"]
+
 
 class BreakdownOut(BaseModel):
     salary: float
@@ -13,6 +15,7 @@ class BreakdownOut(BaseModel):
     savings_quotas: float
     debit_expenses: float
     credit_card_total: float
+
 
 class MonthItemOut(BaseModel):
     id: int
@@ -23,14 +26,17 @@ class MonthItemOut(BaseModel):
     final_balance: float | None
     leftover_decision: str | None
 
+
 class NameAmountOut(BaseModel):
     name: str
     amount: float
+
 
 class CardTotalOut(BaseModel):
     id: int
     name: str
     total: float
+
 
 class MonthDetailOut(MonthItemOut):
     breakdown: BreakdownOut
@@ -39,6 +45,7 @@ class MonthDetailOut(MonthItemOut):
     fixed_expenses: list[NameAmountOut]
     savings_quotas: list[NameAmountOut]
     credit_cards: list[CardTotalOut]
+
 
 class LeftoverDecisionOut(MonthItemOut):
     extra_income: ExtraIncomeOut | None

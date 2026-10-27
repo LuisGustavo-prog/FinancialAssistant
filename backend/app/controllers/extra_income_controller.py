@@ -12,11 +12,13 @@ from app.db.repositories import extra_income_repository as incomes
 from app.db.repositories import month_repository as months
 from app.errors import NoOpenMonthError, NotFoundError
 
+
 def _clean_description(description: str | None) -> str | None:
     if description is None:
         return None
     description = description.strip()
     return description or None
+
 
 def _positive_amount(amount: float) -> float:
     value = round_money(amount)
@@ -24,11 +26,13 @@ def _positive_amount(amount: float) -> float:
         raise ValueError("O valor da renda precisa ser maior que zero.")
     return value
 
+
 def _get_or_raise(conn: sqlite3.Connection, income_id: int) -> dict:
     row = incomes.get_extra_income(conn, income_id)
     if row is None:
         raise NotFoundError("extra_income", income_id)
     return row
+
 
 def list_extra_incomes() -> list[dict]:
     with session() as conn:
@@ -36,6 +40,7 @@ def list_extra_incomes() -> list[dict]:
         if month is None:
             return []
         return [extra_income_item(row) for row in incomes.list_extra_incomes(conn, month["id"])]
+
 
 def create_extra_income(
     amount: float,
@@ -61,6 +66,7 @@ def create_extra_income(
         )
         return extra_income_item(incomes.get_extra_income(conn, income_id))
 
+
 def update_extra_income(
     income_id: int,
     amount: float | None = None,
@@ -84,6 +90,7 @@ def update_extra_income(
             row["description"] if isinstance(description, _Unset) else _clean_description(description),
         )
         return extra_income_item(incomes.get_extra_income(conn, income_id))
+
 
 def delete_extra_income(income_id: int, today: date | None = None) -> None:
     with session(immediate=True) as conn:

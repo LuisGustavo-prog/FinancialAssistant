@@ -4,9 +4,11 @@ from app.controllers import settings_controller
 
 router = APIRouter(tags=["settings"])
 
+
 @router.get("/settings", response_model=SettingsOut)
 def get_settings():
     return settings_controller.get_settings()
+
 
 @router.put("/settings", response_model=SettingsOut)
 def save_settings(body: SettingsIn):

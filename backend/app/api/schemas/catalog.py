@@ -1,14 +1,17 @@
 from pydantic import BaseModel
 from app.api.schemas.common import Name, PositiveMoney
 
+
 class TemplateIn(BaseModel):
     name: Name
     amount: PositiveMoney
+
 
 class TemplatePatch(BaseModel):
     name: Name | None = None
     amount: PositiveMoney | None = None
     is_active: bool | None = None
+
 
 class TemplateOut(BaseModel):
     id: int
@@ -16,12 +19,15 @@ class TemplateOut(BaseModel):
     amount: float
     is_active: bool
 
+
 class CategoryIn(BaseModel):
     name: Name
+
 
 class CategoryPatch(BaseModel):
     name: Name | None = None
     is_active: bool | None = None
+
 
 class CategoryOut(BaseModel):
     id: int

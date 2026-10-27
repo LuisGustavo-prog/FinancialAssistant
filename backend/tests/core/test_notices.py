@@ -95,9 +95,7 @@ def test_zero_positive_or_noise_balance_creates_no_negative_notice(balance):
 
 def test_skipped_months_create_the_unused_months_notice():
     notices = closing_notices(closed(balance=100.0), 2027, 1)
-    assert notices == [
-        Notice(id=None, code=NoticeCode.UNUSED_MONTHS, params={"months": ["2026-11", "2026-12"]})
-    ]
+    assert notices == [Notice(id=None, code=NoticeCode.UNUSED_MONTHS, params={"months": ["2026-11", "2026-12"]})]
 
 
 def test_negative_and_skipped_months_create_both_notices_in_order():

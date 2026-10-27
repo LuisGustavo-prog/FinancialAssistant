@@ -24,8 +24,10 @@ from app.db.repositories import settings_repository as settings
 
 RECENT_EXPENSES_LIMIT = 5
 
+
 def _notice_item(notice: Notice) -> dict:
     return {"id": notice.id, "code": notice.code.value, "params": notice.params}
+
 
 def _pending_leftover(conn: sqlite3.Connection) -> dict | None:
     rows = months.list_closed_months(conn)
@@ -39,6 +41,7 @@ def _pending_leftover(conn: sqlite3.Connection) -> dict | None:
         "month_number": row["month_number"],
         "amount": round_money(oldest.final_balance),
     }
+
 
 def get_home(today: date | None = None) -> dict:
     with session() as conn:
@@ -69,10 +72,10 @@ def get_home(today: date | None = None) -> dict:
             "notices": [_notice_item(n) for n in active_notices(stored, day, active_cards)],
             "pending_leftover": _pending_leftover(conn),
             "recent_expenses": [
-                expense_item(row)
-                for row in expenses.list_recent_expenses(conn, month["id"], RECENT_EXPENSES_LIMIT)
+                expense_item(row) for row in expenses.list_recent_expenses(conn, month["id"], RECENT_EXPENSES_LIMIT)
             ],
         }
+
 
 def dismiss_notice(notice_id: int) -> None:
     with session(immediate=True) as conn:

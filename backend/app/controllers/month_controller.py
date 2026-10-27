@@ -13,6 +13,7 @@ from app.db.repositories import extra_income_repository as incomes
 from app.db.repositories import month_repository as months
 from app.errors import LeftoverNotPendingError, NoOpenMonthError, NotFoundError
 
+
 def _month_item(row: dict) -> dict:
     return {
         "id": row["id"],
@@ -24,15 +25,18 @@ def _month_item(row: dict) -> dict:
         "leftover_decision": row["leftover_decision"],
     }
 
+
 def list_months() -> list[dict]:
     with session() as conn:
         return [_month_item(row) for row in reversed(months.list_closed_months(conn))]
+
 
 def _closed_month_or_raise(conn: sqlite3.Connection, month_id: int) -> dict:
     row = months.get_month(conn, month_id)
     if row is None or row["status"] != "closed":
         raise NotFoundError("month", month_id)
     return row
+
 
 def get_month(month_id: int) -> dict:
     with session() as conn:
@@ -42,8 +46,7 @@ def get_month(month_id: int) -> dict:
             "breakdown": asdict(build_breakdown(conn, row)),
             "expenses": [expense_item(r) for r in expenses.list_expenses(conn, month_id)],
             "extra_incomes": [
-                {**extra_income_item(r), "is_editable": False}
-                for r in incomes.list_extra_incomes(conn, month_id)
+                {**extra_income_item(r), "is_editable": False} for r in incomes.list_extra_incomes(conn, month_id)
             ],
             "fixed_expenses": [
                 {"name": r["name"], "amount": r["amount"]} for r in months.list_fixed_expenses(conn, month_id)
@@ -57,6 +60,7 @@ def get_month(month_id: int) -> dict:
             ],
         }
 
+
 def decide_leftover(month_id: int, decision: str, today: date | None = None) -> dict:
     if decision not in (LeftoverDecision.CARRIED.value, LeftoverDecision.DECLINED.value):
         raise ValueError("A decisao deve ser 'carried' ou 'declined'.")
@@ -66,8 +70,8 @@ def decide_leftover(month_id: int, decision: str, today: date | None = None) -> 
         if row is None:
             raise NotFoundError("month", month_id)
         if row["status"] != "closed":
-            raise LeftoverNotPendingError(None) 
-        
+            raise LeftoverNotPendingError(None)
+
         day = resolve_today(conn, today)
         outcome = decide_leftover_rule(
             to_closed_month(row), carry=decision == LeftoverDecision.CARRIED.value, today=day

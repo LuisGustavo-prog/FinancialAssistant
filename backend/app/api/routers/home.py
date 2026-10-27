@@ -5,6 +5,7 @@ from app.controllers import home_controller
 
 router = APIRouter(tags=["home"])
 
+
 @router.get("/home", response_model=HomeOut)
 def get_home():
     home = home_controller.get_home()
@@ -12,13 +13,13 @@ def get_home():
         return home
 
     home["notices"] = [
-        {**notice, "message": notice_message(notice["code"], notice["params"])}
-        for notice in home["notices"]
+        {**notice, "message": notice_message(notice["code"], notice["params"])} for notice in home["notices"]
     ]
     leftover = home["pending_leftover"]
     if leftover is not None:
         leftover["message"] = leftover_message(leftover["month_number"], leftover["amount"])
     return home
+
 
 @router.post("/notices/{notice_id}/dismiss", status_code=204)
 def dismiss_notice(notice_id: int):

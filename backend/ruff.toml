@@ -1,0 +1,7 @@
+line-length = 120
+target-version = "py313"
+
+[lint]
+# E e F: erros de estilo e de codigo (variavel nao usada, import que nao existe).
+# I: imports em ordem. UP: sintaxe moderna do Python. B: armadilhas comuns.
+select = ["E", "F", "I", "UP", "B"]

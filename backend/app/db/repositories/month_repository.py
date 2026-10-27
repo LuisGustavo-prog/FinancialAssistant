@@ -29,9 +29,7 @@ def get_open_month(conn: sqlite3.Connection) -> dict | None:
 
 def list_closed_months(conn: sqlite3.Connection) -> list[dict]:
     """Meses fechados, do mais antigo para o mais novo."""
-    rows = conn.execute(
-        "SELECT * FROM month WHERE status = 'closed' ORDER BY year, month_number"
-    ).fetchall()
+    rows = conn.execute("SELECT * FROM month WHERE status = 'closed' ORDER BY year, month_number").fetchall()
     return [dict(row) for row in rows]
 
 
@@ -65,9 +63,7 @@ def close_month(
 
 def update_salary(conn: sqlite3.Connection, month_id: int, salary: float) -> bool:
     """Altera o salario de um mes aberto. False se o mes nao esta aberto."""
-    cursor = conn.execute(
-        "UPDATE month SET salary = ? WHERE id = ? AND status = 'open'", (salary, month_id)
-    )
+    cursor = conn.execute("UPDATE month SET salary = ? WHERE id = ? AND status = 'open'", (salary, month_id))
     return cursor.rowcount == 1
 
 
@@ -86,9 +82,7 @@ def set_leftover_decision(conn: sqlite3.Connection, month_id: int, decision: str
 # --------------------------------------------------------------------------
 def _list_copies(conn: sqlite3.Connection, table: str, month_id: int) -> list[dict]:
     assert table in _COPY_TABLES
-    rows = conn.execute(
-        f"SELECT * FROM {table} WHERE month_id = ? ORDER BY id", (month_id,)
-    ).fetchall()
+    rows = conn.execute(f"SELECT * FROM {table} WHERE month_id = ? ORDER BY id", (month_id,)).fetchall()
     return [dict(row) for row in rows]
 
 
@@ -110,9 +104,7 @@ def _insert_copy(
 
 def _update_copy(conn: sqlite3.Connection, table: str, copy_id: int, name: str, amount: float) -> bool:
     assert table in _COPY_TABLES
-    cursor = conn.execute(
-        f"UPDATE {table} SET name = ?, amount = ? WHERE id = ?", (name, amount, copy_id)
-    )
+    cursor = conn.execute(f"UPDATE {table} SET name = ?, amount = ? WHERE id = ?", (name, amount, copy_id))
     return cursor.rowcount == 1
 
 

@@ -12,11 +12,13 @@ from app.db.repositories import expense_repository as expenses
 from app.db.repositories import month_repository as months
 from app.errors import CategoryInactiveError, NoOpenMonthError, NotFoundError
 
+
 def _clean_description(description: str | None) -> str | None:
     if description is None:
         return None
     description = description.strip()
     return description or None
+
 
 def _positive_amount(amount: float) -> float:
     value = round_money(amount)
@@ -24,11 +26,13 @@ def _positive_amount(amount: float) -> float:
         raise ValueError("O valor do gasto precisa ser maior que zero.")
     return value
 
+
 def _require_open_month(conn: sqlite3.Connection) -> dict:
     month = months.get_open_month(conn)
     if month is None:
         raise NoOpenMonthError()
     return month
+
 
 def _chosen_category(conn: sqlite3.Connection, category_id: int | None, keep_id: int | None = None) -> int:
     if category_id is None:
@@ -40,12 +44,14 @@ def _chosen_category(conn: sqlite3.Connection, category_id: int | None, keep_id:
         raise CategoryInactiveError(category_id)
     return category_id
 
+
 def list_expenses() -> list[dict]:
     with session() as conn:
         month = months.get_open_month(conn)
         if month is None:
             return []
         return [expense_item(row) for row in expenses.list_expenses(conn, month["id"])]
+
 
 def create_expense(
     amount: float,
@@ -65,6 +71,7 @@ def create_expense(
             conn, month["id"], value, to_iso(entry_date), _clean_description(description), chosen
         )
         return expense_item(expenses.get_expense(conn, expense_id))
+
 
 def update_expense(
     expense_id: int,
@@ -94,6 +101,7 @@ def update_expense(
             else _chosen_category(conn, category_id, keep_id=row["category_id"]),
         )
         return expense_item(expenses.get_expense(conn, expense_id))
+
 
 def delete_expense(expense_id: int, today: date | None = None) -> None:
     with session(immediate=True) as conn:

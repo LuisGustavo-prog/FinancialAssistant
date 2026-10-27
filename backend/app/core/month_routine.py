@@ -33,6 +33,7 @@ class RoutineState:
     quota_templates: Sequence[Template]
     active_card_ids: Sequence[int]
 
+
 @dataclass(frozen=True, slots=True)
 class MonthClosing:
     month_id: int
@@ -40,6 +41,7 @@ class MonthClosing:
     result: MonthResult
     closed_at: date
     leftover_decision: LeftoverDecision | None
+
 
 @dataclass(frozen=True, slots=True)
 class NewMonth:
@@ -49,6 +51,7 @@ class NewMonth:
     fixed_expenses: list[NewMonthCopy]
     savings_quotas: list[NewMonthCopy]
     card_ids: list[int]
+
 
 @dataclass(frozen=True, slots=True)
 class RoutinePlan:
@@ -63,6 +66,7 @@ def effective_today(system_today: date, last_checked_date: date | None) -> date:
     if last_checked_date is not None and system_today < last_checked_date:
         return last_checked_date
     return system_today
+
 
 def build_new_month(
     year: int,
@@ -80,6 +84,7 @@ def build_new_month(
         savings_quotas=build_month_copies(quota_templates),
         card_ids=list(active_card_ids),
     )
+
 
 def plan_month_routine(state: RoutineState, system_today: date) -> RoutinePlan:
     today = effective_today(system_today, state.last_checked_date)

@@ -7,4 +7,5 @@ class _Unset:
     def __bool__(self) -> bool:
         return False
 
+
 UNSET = _Unset()

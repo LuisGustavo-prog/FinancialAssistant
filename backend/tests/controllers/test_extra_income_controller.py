@@ -35,9 +35,7 @@ def add_leftover_income() -> int:
     """Uma renda vinda da sobra, como o caso de uso da sobra a cria."""
     with session() as conn:
         month = months.get_open_month(conn)
-        return incomes.insert_extra_income(
-            conn, month["id"], 250.0, "2026-10-02", "Sobra de setembro", "leftover"
-        )
+        return incomes.insert_extra_income(conn, month["id"], 250.0, "2026-10-02", "Sobra de setembro", "leftover")
 
 
 def test_without_an_open_month_the_list_is_empty_and_creating_is_refused(db_path):
@@ -94,7 +92,10 @@ def test_patch_changes_only_the_given_fields_and_description_can_be_cleared(open
 
 def test_changing_the_date_respects_the_month_locks(open_month):
     item = incomes_ctl.create_extra_income(200.0, today=TODAY)
-    assert incomes_ctl.update_extra_income(item["id"], occurred_on=date(2026, 10, 3), today=TODAY)["occurred_on"] == "2026-10-03"
+    assert (
+        incomes_ctl.update_extra_income(item["id"], occurred_on=date(2026, 10, 3), today=TODAY)["occurred_on"]
+        == "2026-10-03"
+    )
     with pytest.raises(MonthClosedError):
         incomes_ctl.update_extra_income(item["id"], occurred_on=date(2026, 9, 30), today=TODAY)
     with pytest.raises(FutureDateError):

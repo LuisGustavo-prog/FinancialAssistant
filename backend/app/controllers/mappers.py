@@ -11,14 +11,18 @@ from app.core.models import (
     Template,
 )
 
+
 def to_date(text: str) -> date:
     return date.fromisoformat(text)
+
 
 def to_date_or_none(text: str | None) -> date | None:
     return None if text is None else date.fromisoformat(text)
 
+
 def to_iso(day: date) -> str:
     return day.isoformat()
+
 
 def to_template(row: dict) -> Template:
     return Template(
@@ -28,6 +32,7 @@ def to_template(row: dict) -> Template:
         is_active=bool(row["is_active"]),
     )
 
+
 def to_month_copy(row: dict) -> MonthCopy:
     return MonthCopy(
         id=row["id"],
@@ -35,6 +40,7 @@ def to_month_copy(row: dict) -> MonthCopy:
         name=row["name"],
         amount=row["amount"],
     )
+
 
 def to_closed_month(row: dict) -> ClosedMonth:
     decision = row["leftover_decision"]
@@ -45,14 +51,14 @@ def to_closed_month(row: dict) -> ClosedMonth:
         leftover_decision=None if decision is None else LeftoverDecision(decision),
     )
 
+
 def to_card_entry(row: dict) -> CardEntry:
     return CardEntry(type=CardEntryType(row["type"]), amount=row["amount"])
 
+
 def notices_from_json(text: str) -> list[Notice]:
-    return [
-        Notice(id=item["id"], code=NoticeCode(item["code"]), params=item["params"])
-        for item in json.loads(text)
-    ]
+    return [Notice(id=item["id"], code=NoticeCode(item["code"]), params=item["params"]) for item in json.loads(text)]
+
 
 def notices_to_json(notices: list[Notice]) -> str:
     return json.dumps(

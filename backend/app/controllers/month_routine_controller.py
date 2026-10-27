@@ -25,11 +25,13 @@ from app.db.repositories import month_repository as months
 from app.db.repositories import settings_repository as settings
 from app.db.repositories import template_repository as templates
 
+
 @dataclass(frozen=True, slots=True)
 class RoutineResult:
     today: date
     closed_month_id: int | None
     created_month_id: int | None
+
 
 def run(today: date | None = None) -> RoutineResult:
     system_today = today if today is not None else clock.today()
@@ -44,6 +46,7 @@ def run(today: date | None = None) -> RoutineResult:
         plan = plan_month_routine(state, system_today)
         closed_id, created_id = _apply(conn, plan)
     return RoutineResult(plan.today, closed_id, created_id)
+
 
 def _read_state(conn: sqlite3.Connection) -> RoutineState:
     settings_row = settings.get(conn)
@@ -64,6 +67,7 @@ def _read_state(conn: sqlite3.Connection) -> RoutineState:
         quota_templates=[to_template(r) for r in templates.list_savings_quota_templates(conn)],
         active_card_ids=cards.list_active_card_ids(conn),
     )
+
 
 def _apply(conn: sqlite3.Connection, plan: RoutinePlan) -> tuple[int | None, int | None]:
     closed_id: int | None = None
@@ -94,6 +98,7 @@ def _apply(conn: sqlite3.Connection, plan: RoutinePlan) -> tuple[int | None, int
     settings.set_last_checked_date(conn, to_iso(plan.last_checked_date))
     return closed_id, created_id
 
+
 def create_month(conn: sqlite3.Connection, new_month: NewMonth) -> int:
     month_id = months.create_month(conn, new_month.year, new_month.month_number, new_month.salary)
     for copy in new_month.fixed_expenses:
@@ -103,6 +108,7 @@ def create_month(conn: sqlite3.Connection, new_month: NewMonth) -> int:
     for card_id in new_month.card_ids:
         cards.insert_card_month(conn, card_id, month_id)
     return month_id
+
 
 def new_month_for(conn: sqlite3.Connection, year: int, month_number: int, salary: float) -> NewMonth:
     return build_new_month(

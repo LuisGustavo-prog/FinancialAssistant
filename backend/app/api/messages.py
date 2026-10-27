@@ -24,27 +24,29 @@ _RESOURCE_NAMES = {
     "month": "o mês",
 }
 
+
 def brl(value: float) -> str:
     text = f"{abs(value):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     return f"-R$ {text}" if value < 0 else f"R$ {text}"
 
+
 def month_name(label: str) -> str:
     return MONTH_NAMES[int(label.split("-")[1]) - 1]
+
 
 def join_pt(items: list[str]) -> str:
     if len(items) <= 1:
         return "".join(items)
     return ", ".join(items[:-1]) + " e " + items[-1]
 
+
 def _capitalize(text: str) -> str:
     return text[:1].upper() + text[1:]
 
+
 def error_message(code: str, params: dict) -> str:
     if code == "value_decreased":
-        return (
-            f"O valor do cartão diminuiu {brl(params['difference'])}. "
-            "Foi um pagamento ou um estorno?"
-        )
+        return f"O valor do cartão diminuiu {brl(params['difference'])}. Foi um pagamento ou um estorno?"
     if code == "month_closed":
         return (
             f"O mês de {month_name(params['closed_month'])} já fechou. "
@@ -64,9 +66,9 @@ def error_message(code: str, params: dict) -> str:
     if code == "no_open_month":
         return "Informe o seu salário em Cadastros antes de fazer lançamentos."
     if code == "name_already_exists":
-        return f"Já existe uma categoria chamada \"{params['name']}\"."
+        return f'Já existe uma categoria chamada "{params["name"]}".'
     if code == "default_category_locked":
-        return "A categoria \"Outros\" não pode ser desativada."
+        return 'A categoria "Outros" não pode ser desativada.'
     if code == "category_inactive":
         return "Esta categoria está desativada. Escolha outra."
     if code == "validation_error":
@@ -82,6 +84,7 @@ def error_message(code: str, params: dict) -> str:
     if code == "internal_error":
         return "Algo deu errado no servidor. Tente de novo em instantes."
     return "Não foi possível concluir a operação."
+
 
 def notice_message(code: str, params: dict) -> str:
     if code == "month_ending":

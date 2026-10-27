@@ -14,6 +14,7 @@ from app.errors import (
     ValueDecreasedError,
 )
 
+
 @pytest.mark.parametrize(
     ("error", "code", "params"),
     [

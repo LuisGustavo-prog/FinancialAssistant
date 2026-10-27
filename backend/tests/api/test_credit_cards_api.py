@@ -42,7 +42,13 @@ def test_updating_the_reported_value(ready, card):
     response = put_value(ready, card["id"], 150)
     assert response.status_code == 200
     state = response.json()
-    assert (state["reported_value"], state["total"], state["updated_at"], state["days_since_update"], state["is_outdated"]) == (
+    assert (
+        state["reported_value"],
+        state["total"],
+        state["updated_at"],
+        state["days_since_update"],
+        state["is_outdated"],
+    ) == (
         150.0,
         150.0,
         "2026-10-23",
@@ -77,7 +83,9 @@ def test_a_refund_makes_the_total_shrink(ready, card):
     assert state["total"] == 60.0
 
 
-@pytest.mark.parametrize("body", [{}, {"reported_value": -1}, {"reported_value": 10, "type": "purchase"}, {"reported_value": "x"}])
+@pytest.mark.parametrize(
+    "body", [{}, {"reported_value": -1}, {"reported_value": 10, "type": "purchase"}, {"reported_value": "x"}]
+)
 def test_invalid_reported_value_bodies(ready, card, body):
     response = ready.put(f"/credit-cards/{card['id']}/current-month", json=body)
     assert response.status_code == 422
@@ -114,7 +122,10 @@ def test_invalid_payment_amounts(ready, card, amount):
 
 
 def test_rename_deactivate_and_reactivate(ready, card):
-    assert ready.patch(f"/credit-cards/{card['id']}", json={"name": "Nubank Ultravioleta"}).json()["name"] == "Nubank Ultravioleta"
+    assert (
+        ready.patch(f"/credit-cards/{card['id']}", json={"name": "Nubank Ultravioleta"}).json()["name"]
+        == "Nubank Ultravioleta"
+    )
     off = ready.patch(f"/credit-cards/{card['id']}", json={"is_active": False}).json()
     assert (off["is_active"], off["in_current_month"]) == (False, True)  # vale ate o mes fechar
     on = ready.patch(f"/credit-cards/{card['id']}", json={"is_active": True}).json()
@@ -154,7 +165,10 @@ def test_edit_a_line_and_the_total_follows(ready, card, entry):
 
 
 def test_line_date_and_validation_rules(ready, entry):
-    assert ready.patch(f"/credit-card-entries/{entry['id']}", json={"occurred_on": "2026-09-30"}).json()["code"] == "month_closed"
+    assert (
+        ready.patch(f"/credit-card-entries/{entry['id']}", json={"occurred_on": "2026-09-30"}).json()["code"]
+        == "month_closed"
+    )
     assert ready.patch(f"/credit-card-entries/{entry['id']}", json={"amount": 0}).status_code == 422
     assert ready.patch(f"/credit-card-entries/{entry['id']}", json={"type": "purchase"}).status_code == 422
 

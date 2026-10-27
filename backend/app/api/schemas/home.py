@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from app.api.schemas.expenses import ExpenseOut
 from app.api.schemas.months import BreakdownOut
 
+
 class HomeMonthOut(BaseModel):
     id: int
     year: int
@@ -10,11 +11,13 @@ class HomeMonthOut(BaseModel):
     status: str
     days_left: int
 
+
 class NoticeOut(BaseModel):
     id: int | None
     code: str
     params: dict
     message: str
+
 
 class PendingLeftoverOut(BaseModel):
     month_id: int
@@ -22,6 +25,7 @@ class PendingLeftoverOut(BaseModel):
     month_number: int
     amount: float
     message: str
+
 
 class HomeOk(BaseModel):
     status: Literal["ok"]
@@ -32,7 +36,9 @@ class HomeOk(BaseModel):
     pending_leftover: PendingLeftoverOut | None
     recent_expenses: list[ExpenseOut]
 
+
 class HomeNeedsSetup(BaseModel):
     status: Literal["needs_setup"]
+
 
 HomeOut = Annotated[HomeOk | HomeNeedsSetup, Field(discriminator="status")]
